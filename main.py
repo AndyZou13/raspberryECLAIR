@@ -1,7 +1,10 @@
 from fastapi import FastAPI
+from starlette.responses import FileResponse 
 from fastapi.staticfiles import StaticFiles
-from fastapi import Request
 
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
-app.mount("/", StaticFiles(directory="static", html = True), name="static" )
+@app.get("/")
+async def root():
+    return FileResponse("static/index.html")
