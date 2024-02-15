@@ -2,10 +2,10 @@ from flask import Flask, render_template, url_for, redirect, flash
 from forms import RegistrationForm, LoginForm
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-
+import os
 app = Flask(__name__)
 
-client = MongoClient(app.config.get('MONGODB_URI'), server_api=ServerApi('1'))
+client = MongoClient(os.environ.get('MONGODB_URI'), server_api=ServerApi('1'))
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
