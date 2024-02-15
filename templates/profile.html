@@ -1,9 +1,4 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Profile Page - raspberryECLAIR</title>
-    </head>
-    <body>
-        <h1>Logged in as {{name}}</h1>
-    </body>
-</html>
+{% extends "layout.html" %}
+{% block content %}
+        <p>Logged in as {{name}}</p>
+{% endblock content%}

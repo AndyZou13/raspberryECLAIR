@@ -1,18 +1,5 @@
-<!DOCTYPE html>
-<html lang = "en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - raspberryECLAIR</title>
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-    
-</head>
-
-<body>
+{% extends "layout.html" %}
+{% block content %}
     <div class = "wrapper">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
@@ -37,15 +24,11 @@
             {{ form.submit(class="btn", placeholder="Register")}}
 
             <div class="register-link">
-                <small>Already have an account? <a href="{{ url_for('loginPage') }}"> Sign In </a></small>
+                <p>Already have an account? <a href="{{ url_for('loginPage') }}" style="text-decoration:underline"> Sign In </a></p>
             </div>
 
             {{ endform }}
             
         </form>
     </div>
-
-
-
-</body>
-</html>
+{% endblock content %}
