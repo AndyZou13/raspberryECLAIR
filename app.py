@@ -4,8 +4,10 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import os
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
+
 client = MongoClient(os.environ.get('MONGODB_URI'), server_api=ServerApi('1'))
 
 try:
