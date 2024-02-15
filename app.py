@@ -6,7 +6,6 @@ from pymongo.server_api import ServerApi
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '163c1af8b4a801e8fddec7e72b6db4dd'
-app.config['MONGODB_URI'] = "mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority"
 
 client = MongoClient(app.config.get('MONGODB_URI'), server_api=ServerApi('1'))
 try:
@@ -15,7 +14,7 @@ try:
 except Exception as e:
     print(e)
     
-db = client["public-charger"]
+db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
 
