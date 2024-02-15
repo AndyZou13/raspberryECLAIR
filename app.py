@@ -34,6 +34,7 @@ def loginPage():
                 global username 
                 username = form.username.data
                 return redirect(url_for('profilePage'))
+            return redirect(url_for('loginPage'))
     return render_template('login.html', form = form, title=title)
 
 @app.route('/register', methods=['GET', 'POST'])
