@@ -5,8 +5,6 @@ from pymongo.server_api import ServerApi
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = '163c1af8b4a801e8fddec7e72b6db4dd'
-
 client = MongoClient(app.config.get('MONGODB_URI'), server_api=ServerApi('1'))
 try:
     client.admin.command('ping')
