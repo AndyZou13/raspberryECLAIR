@@ -4,8 +4,9 @@ from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import os
 app = Flask(__name__)
-
+secretKey = os.environ.get('SECRET_KEY')
 client = MongoClient(os.environ.get('MONGODB_URI'), server_api=ServerApi('1'))
+
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
