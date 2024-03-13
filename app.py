@@ -2,13 +2,13 @@ from flask import Flask, render_template, url_for, redirect, flash
 from forms import RegistrationForm, LoginForm
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-import os
+# import os
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
-
-client = MongoClient(os.environ.get('MONGODB_URI'), server_api=ServerApi('1'))
+# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+# app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
+app.config['SECRET_KEY'] = "1274582374512345"
+client = MongoClient("mongodb+srv://a1zou:a1zou@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU", server_api=ServerApi('1'))
 
 try:
     client.admin.command('ping')
