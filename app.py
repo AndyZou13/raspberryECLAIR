@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, redirect, flash
 from forms import RegistrationForm, LoginForm
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
-# import os
+import os
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
