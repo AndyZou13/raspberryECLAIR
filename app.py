@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 # app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
-
+app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
 client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU", server_api=ServerApi('1'))
 
 try:
