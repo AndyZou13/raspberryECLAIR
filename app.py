@@ -49,7 +49,8 @@ def readSlots():
         time = int(time)
         if time >= 12:
             time = time - 12
-            time = time + "PM"
+            time = str(time)
+            time = time[:2] + ':' + time[2:] + "PM"
         match month:
             case '1': 
                 month = "January"
@@ -76,14 +77,15 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time
-        print(message)
+        session.append(message)
     if slot2["month"] != "":
         month = slot2["month"]
         day = slot2["day"]
         time = slot2["time"]
         if time >= 12:
             time = time - 12
-            time = time + "PM"
+            time = str(time)
+            time = time[:2] + ':' + time[2:] + "PM"
         match month:
             case '1': 
                 month = "January"
@@ -110,14 +112,15 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
-        print(message)
+        session.append(message)
     if slot3["month"] != "":
         month = slot3["month"]
         day = slot3["day"]
         time = slot3["time"]
         if time >= 12:
             time = time - 12
-            time = time + "PM"
+            time = str(time)
+            time = time[:2] + ':' + time[2:] + "PM"
         match month:
             case '1': 
                 month = "January"
@@ -144,7 +147,7 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
-        print(message)
+        session.append(message)
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def loginPage():
