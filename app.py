@@ -38,7 +38,6 @@ id = "dummy"
 def readSlots():
     doc = docMaster["booked"]
     slot1 = doc["slot1"]
-    print(slot1)
     slot2 = doc["slot2"]
     slot3 = doc["slot3"]
     if slot1["month"] == "":
@@ -47,57 +46,103 @@ def readSlots():
         month = slot1["month"]
         day = slot1["day"]
         time = slot1["time"]
+        time = int(time)
+        if time >= 12:
+            time = time - 12
+            time = time + "PM"
         match month:
-            case 1: month = "January"
-            case 2: month = "February"
-            case 3: month = "March"
-            case 4: month = "April"
-            case 5: month = "May"
-            case 6: month = "June"
-            case 7: month = "July"
-            case 8: month = "August"
-            case 9: month = "September"
-            case 10: month = "October"
-            case 11: month = "November"
-            case 12: month = "December"
-        message = month + " " + day + ", " + time[:2] + ':' + time[2:]
+            case '1': 
+                month = "January"
+            case '2': 
+                month = "February"
+            case '3': 
+                month = "March"
+            case '4': 
+                month = "April"
+            case '5': 
+                month = "May"
+            case '6': 
+                month = "June"
+            case '7': 
+                month = "July"
+            case '8': 
+                month = "August"
+            case '9': 
+                month = "September"
+            case '10': 
+                month = "October"
+            case '11': 
+                month = "November"
+            case '12': 
+                month = "December"
+        message = month + " " + day + ", " + time
         print(message)
     if slot2["month"] != "":
         month = slot2["month"]
         day = slot2["day"]
         time = slot2["time"]
+        if time >= 12:
+            time = time - 12
+            time = time + "PM"
         match month:
-            case 1: month = "January"
-            case 2: month = "February"
-            case 3: month = "March"
-            case 4: month = "April"
-            case 5: month = "May"
-            case 6: month = "June"
-            case 7: month = "July"
-            case 8: month = "August"
-            case 9: month = "September"
-            case 10: month = "October"
-            case 11: month = "November"
-            case 12: month = "December"
+            case '1': 
+                month = "January"
+            case '2': 
+                month = "February"
+            case '3': 
+                month = "March"
+            case '4': 
+                month = "April"
+            case '5': 
+                month = "May"
+            case '6': 
+                month = "June"
+            case '7': 
+                month = "July"
+            case '8': 
+                month = "August"
+            case '9': 
+                month = "September"
+            case '10': 
+                month = "October"
+            case '11': 
+                month = "November"
+            case '12': 
+                month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
         print(message)
     if slot3["month"] != "":
         month = slot3["month"]
         day = slot3["day"]
         time = slot3["time"]
+        if time >= 12:
+            time = time - 12
+            time = time + "PM"
         match month:
-            case 1: month = "January"
-            case 2: month = "February"
-            case 3: month = "March"
-            case 4: month = "April"
-            case 5: month = "May"
-            case 6: month = "June"
-            case 7: month = "July"
-            case 8: month = "August"
-            case 9: month = "September"
-            case 10: month = "October"
-            case 11: month = "November"
-            case 12: month = "December"
+            case '1': 
+                month = "January"
+            case '2': 
+                month = "February"
+            case '3': 
+                month = "March"
+            case '4': 
+                month = "April"
+            case '5': 
+                month = "May"
+            case '6': 
+                month = "June"
+            case '7': 
+                month = "July"
+            case '8': 
+                month = "August"
+            case '9': 
+                month = "September"
+            case '10': 
+                month = "October"
+            case '11': 
+                month = "November"
+            case '12': 
+                month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
         print(message)
 @app.route('/', methods=['GET', 'POST'])
@@ -107,15 +152,14 @@ def loginPage():
     title = "Login"
     if form.validate_on_submit():
         query = {"username" : form.username.data}
-        global docMaster
-        docMaster = colUsers.find_one(query)
-        if docMaster:
-            p=docMaster["password"]
+        doc = colUsers.find_one(query)
+        if doc:
+            p=doc["password"]
             if form.password.data == p:
                 global username
                 username = form.username.data
-                global id
-                id = docMaster["_id"]
+                id = doc["_id"]
+                global docMaster
                 docMaster = colData.find_one({"_id" : id})
                 return redirect(url_for('dashMain'))
             return redirect(url_for('loginPage'))
@@ -127,20 +171,22 @@ def registerPage():
     title = "Register"
     if form.validate_on_submit():
         query = {"username" : form.username.data}
-        global docMaster
-        docMaster = colUsers.find_one(query)
-        if docMaster:
+        global doc
+        doc = colUsers.find_one(query)
+        if doc:
             return render_template('register.html', form = form, title=title)
         else :
             global username
             username = form.username.data
-            docMaster = {"username" : form.username.data, "password" : form.password.data}
-            x = colUsers.insert_one(docMaster)
+            doc = {"username" : form.username.data, "password" : form.password.data}
+            x = colUsers.insert_one(doc)
             file = []
             with open('customerDataModelBlank.json') as file:
                 fileData = json.load(file)
             fileData.update({"_id" : x.inserted_id})
             colData.insert_one(fileData)
+            global docMaster
+            docMaster = colData.find_one({"_id" : id})
             return redirect(url_for('dashMain'))
     return render_template('register.html', form = form, title=title)
 
