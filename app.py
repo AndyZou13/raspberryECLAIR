@@ -203,11 +203,11 @@ def bookingPage():
     if form.validate_on_submit():
         if timeBooked > 3:
             return render_template('dashMain.html', title = title, sessions = session) 
-        form.datum.data
-        match timeBooked:
-            case 0:
-                query = {"$set": {"booked": { "slot1": {"month": }}}}
-                colData.update_one({"_id": id})
+        # form.datum.data
+        # match timeBooked:
+        #     case 0:
+        #         query = {"$set": {"booked": { "slot1": {"month": }}}}
+        #         colData.update_one({"_id": id})
         print(form.datum.data)
         print(form.submit3.data)
         print(form.submit2.data)
