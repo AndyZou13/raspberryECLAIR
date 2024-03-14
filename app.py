@@ -46,9 +46,16 @@ def readSlots():
         day = slot1["day"]
         time = slot1["time"]
         time = int(time)
-        if time >= 12:
-            time = time - 12
+        if time > 1300:
+            time = time - 1200
             time = str(time)
+            while len(time) < 3:
+                time = "0" + time
+            time = time[:2] + ':' + time[2:] + "PM"
+        elif time < 1300 and time >= 1200:
+            time = str(time)
+            time = time[:2] + ':' + time[2:] + "PM"
+        else:
             time = time[:2] + ':' + time[2:] + "PM"
         match month:
             case '1': 
@@ -83,9 +90,16 @@ def readSlots():
         day = slot2["day"]
         time = slot2["time"]
         time = int(time)
-        if time >= 12:
-            time = time - 12
+        if time > 1300:
+            time = time - 1200
             time = str(time)
+            while len(time) < 3:
+                time = "0" + time
+            time = time[:2] + ':' + time[2:] + "PM"
+        elif time < 1300 and time >= 1200:
+            time = str(time)
+            time = time[:2] + ':' + time[2:] + "PM"
+        else:
             time = time[:2] + ':' + time[2:] + "PM"
         match month:
             case '1': 
@@ -112,16 +126,23 @@ def readSlots():
                 month = "November"
             case '12': 
                 month = "December"
-        message = month + " " + day + ", " + time[:2] + ':' + time[2:]
+        message = month + " " + day + ", " + time
         if len(session) == 1:
             session.append(message)
     if slot3["month"] != "":
         month = slot3["month"]
         day = slot3["day"]
         time = slot3["time"]
-        if time >= 12:
-            time = time - 12
+        if time > 1300:
+            time = time - 1200
             time = str(time)
+            while len(time) < 3:
+                time = "0" + time
+            time = time[:2] + ':' + time[2:] + "PM"
+        elif time < 1300 and time >= 1200:
+            time = str(time)
+            time = time[:2] + ':' + time[2:] + "PM"
+        else:
             time = time[:2] + ':' + time[2:] + "PM"
         match month:
             case '1': 
@@ -148,7 +169,7 @@ def readSlots():
                 month = "November"
             case '12': 
                 month = "December"
-        message = month + " " + day + ", " + time[:2] + ':' + time[2:]
+        message = month + " " + day + ", " + time
         if len(session) == 2:
             session.append(message)
 @app.route('/', methods=['GET', 'POST'])
