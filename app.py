@@ -25,10 +25,10 @@ docMaster = "dummy"
 username = "dummy"
 session = []
 id = "dummy"
-# def findData() :
-#     doc = colData.find_one({"_id": id})
-#     print(doc)
-    
+timeBooked = 0  
+slot1 = []
+slot2 = []
+slot3 = [] 
 # def readRecentCharges():
     
 # def readRecentPrices():
@@ -77,6 +77,7 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time
+        timeBooked += 1
         session.append(message)
     if slot2["month"] != "":
         month = slot2["month"]
@@ -112,6 +113,7 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
+        timeBooked += 1
         session.append(message)
     if slot3["month"] != "":
         month = slot3["month"]
@@ -147,6 +149,7 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
+        timeBooked += 1
         session.append(message)
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
@@ -198,6 +201,13 @@ def bookingPage():
     form = BookingForm();
     title = "Book a time"
     if form.validate_on_submit():
+        if timeBooked > 3:
+            return render_template('dashMain.html', title = title, sessions = session) 
+        form.datum.data
+        match timeBooked:
+            case 0:
+                query = {"$set": {"booked": { "slot1": {"month": }}}}
+                colData.update_one({"_id": id})
         print(form.datum.data)
         print(form.submit3.data)
         print(form.submit2.data)
@@ -209,6 +219,10 @@ def dashMain():
     title = "Dashboard"
     readSlots()
     return render_template('dashMain.html', title = title, sessions = session)
+
+@app.route('/history')
+def historyPage():
+    return render_template('bookingPage.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
