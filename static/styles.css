@@ -26,7 +26,131 @@ body {
     padding: 30px 40px;
 }
 
-.wrapper h1 {
+.container {
+    background: transparent;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+    color: #fff;
+    padding-left: 20px;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    padding-right: 20px;
+    position: relative;
+}
+
+.container .sidebar {
+    display: flex;
+    flex-direction: column;
+    float: left;
+    width: 300px;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 30px;
+    margin-right: 20px;
+}
+
+.container .sidebar .btn {
+    width: 100%;
+    height: 45px;
+    background: #fff;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0,0,0,.1);
+    cursor: #333;
+    font-weight: 600;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.container .main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width : 85%;
+    color: #fff;
+    border-radius: 10px;
+    padding-right: 10px;
+}
+
+.container .main .graphContainer {
+    height: 50%;
+    width: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 30px;
+    margin: 10px 5px;
+}
+
+.bookingContainer {
+    float: left;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 20px;
+    margin-right: 20px;
+    position: relative;
+}
+
+.booked {
+    display: flex;
+    flex-direction: column;
+    float: right;
+    width: 450px;
+    height: 100%;
+    background: transparent;
+    color: #fff;
+    border-radius: 10px;
+}
+
+.booked .slots {
+    height: 33%;
+    width: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 30px;
+    margin: 10px 5px;
+}
+
+.booking {
+    display: flex;
+    flex-direction: column;
+    float: right;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 15px 15px;
+    margin-right: 20px;
+}
+.wrapper h1 { 
     font-size: 36px;
     text-align: center;
 }

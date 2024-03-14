@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang = "en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if title %}
+    <title>{{ title }} - raspberryECLAIR</title>
+    {% else %}
+    <title> raspberryECLAIR </title>
+    {% endif %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+    
+</head>
+    <body>
+        <div class = "container">
+            <div class = "sidebar">
+                <button class= "btn">Dashboard</button>
+                <button class= "btn">Book Now</button>
+                <button class= "btn">History</button>
+                <button class= "btn" style="margin-top: auto;">Log Out</button>
+            </div>
+            <div class="main">
+            {% block content %}
+            {% endblock content %}
+            </div>
+        </div>
+    </body>
+</html>
