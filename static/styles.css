@@ -70,6 +70,23 @@ body {
     margin-bottom: 10px;
     margin-top: 10px;
 }
+.container .sidebar .btn:hover {
+    background: #e9e7e7;
+}
+
+.bookedTimes {
+    width: 100%;
+    height: 60%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 15px 15px;
+    margin-top: 30px;
+    text-align: center;
+}
 
 .container .main {
     display: flex;
@@ -110,7 +127,18 @@ body {
     margin-right: 20px;
     position: relative;
 }
-
+.dateSelector {
+    width: 20%;
+    background: transparent;
+    border:none;
+    text-align: center;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+}
 .booked {
     display: flex;
     flex-direction: column;
@@ -122,10 +150,36 @@ body {
     border-radius: 10px;
 }
 
-.booked .slots {
+.booked .tiers {
     height: 33%;
     width: 100%;
     background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 30px 30px;
+    margin: 10px 5px;
+}
+
+.booked .tiers:hover {
+    height: 33%;
+    width: 100%;
+    background:#8888ff;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 30px 30px;
+    margin: 10px 5px;
+}
+
+.booked a:hover {
+    height: 33%;
+    width: 100%;
+    background: #8888ff;
     border: 2px solid rgba(255, 255, 255, .2);
     backdrop-filter: blur(20px);
     box-shadow: 0 0 10px rgba(0,0,0,.2);

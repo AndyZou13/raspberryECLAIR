@@ -1,19 +1,22 @@
 {% extends "dashboard.html" %}
 {% block content %}
-<div class="bookingContainer">
-    <div class="booking">
-
+<form style="height:100%" method="POST" action="">
+    <div class="bookingContainer">
+        {{ form.hidden_tag() }}
+        <div class="booking">
+            <h1 style="color: #0084ff">
+                Please arrive within 10 minutes of your booking time or your time slot will be given up.
+            </h1>
+            {{ form.datum(class="dateSelector") }}
+        </div>
+        <div class="booked">
+            <h1 style="text-align:center;">
+                Charging levels
+            </h1>
+                {{ form.submit3(class="tiers", placeholder="Tier 3", style="font-size: 30px;") }}
+                {{ form.submit2(class="tiers", placeholder="Tier 2", style="font-size: 30px;") }}
+                {{ form.submit1(class="tiers", placeholder="Tier 1", style="font-size: 30px;") }}
+        </div>
     </div>
-    <div class="booked">
-        <div class="slots">
-
-        </div>
-        <div class="slots">
-
-        </div>
-        <div class="slots">
-
-        </div>
-    </div>
-</div>
+</form>
 {% endblock content %}
