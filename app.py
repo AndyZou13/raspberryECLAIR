@@ -76,11 +76,13 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time
-        session.append(message)
+        if len(session) == 0:
+            session.append(message)
     if slot2["month"] != "":
         month = slot2["month"]
         day = slot2["day"]
         time = slot2["time"]
+        time = int(time)
         if time >= 12:
             time = time - 12
             time = str(time)
@@ -111,7 +113,8 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
-        session.append(message)
+        if len(session) == 1:
+            session.append(message)
     if slot3["month"] != "":
         month = slot3["month"]
         day = slot3["day"]
@@ -146,7 +149,8 @@ def readSlots():
             case '12': 
                 month = "December"
         message = month + " " + day + ", " + time[:2] + ':' + time[2:]
-        session.append(message)
+        if len(session) == 2:
+            session.append(message)
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def loginPage():
