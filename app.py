@@ -1,7 +1,8 @@
-from flask import Flask, render_template, url_for, redirect, flash
+from flask import Flask, render_template, url_for, redirect, flash, make_response, request
 from forms import RegistrationForm, LoginForm, BookingForm
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
+from bson import ObjectId
 import os
 import json
 app = Flask(__name__)
@@ -9,7 +10,7 @@ app = Flask(__name__)
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 # app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
 app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
-client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU", server_api=ServerApi('1'))
+client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
 
 try:
     client.admin.command('ping')
@@ -21,24 +22,19 @@ db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
 
-docMaster = "dummy"
-username = "dummy"
-session = []
-id = "dummy" 
-slot1 = []
-slot2 = []
-slot3 = [] 
 # def readRecentCharges():
     
 # def readRecentPrices():
     
 # def readHistory():
     
-def readSlots():
+def readSlots(id):
+    docMaster = colData.find_one({"_id": ObjectId(id)})
     doc = docMaster["booked"]
     slot1 = doc["slot1"]
     slot2 = doc["slot2"]
     slot3 = doc["slot3"]
+    session = []
     if slot1["month"] == "":
         return
     else:
@@ -172,39 +168,37 @@ def readSlots():
         message = month + " " + day + ", " + time
         if len(session) == 2:
             session.append(message)
+    return session
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def loginPage():
     form = LoginForm()
     title = "Login"
+    resp = make_response(render_template('login.html', form = form, title=title))
+    resp.set_cookie('personalID', '', expires=0) 
     if form.validate_on_submit():
         query = {"username" : form.username.data}
         doc = colUsers.find_one(query)
         if doc:
             p=doc["password"]
             if form.password.data == p:
-                global username
-                username = form.username.data
                 id = doc["_id"]
-                global docMaster
-                docMaster = colData.find_one({"_id" : id})
-                return redirect(url_for('dashMain'))
-            return redirect(url_for('loginPage'))
-    return render_template('login.html', form = form, title=title)
-
+                resp = make_response(redirect(url_for('dashMain')))
+                resp.set_cookie('personalID', str(id)) 
+                return resp
+    return resp
+    
 @app.route('/register', methods=['GET', 'POST'])
 def registerPage():
     form = RegistrationForm()
     title = "Register"
     if form.validate_on_submit():
         query = {"username" : form.username.data}
-        global doc
         doc = colUsers.find_one(query)
         if doc:
             return render_template('register.html', form = form, title=title)
         else :
-            global username
-            username = form.username.data
             doc = {"username" : form.username.data, "password" : form.password.data}
             x = colUsers.insert_one(doc)
             file = []
@@ -212,27 +206,29 @@ def registerPage():
                 fileData = json.load(file)
             fileData.update({"_id" : x.inserted_id})
             colData.insert_one(fileData)
-            global docMaster
-            docMaster = colData.find_one({"_id" : id})
-            return redirect(url_for('dashMain'))
+            resp = make_response(redirect(url_for('dashMain')))
+            resp.set_cookie('personalID', str(x.inserted_id)) 
+            return resp
     return render_template('register.html', form = form, title=title)
 
 @app.route('/booking', methods=['GET', 'POST'])
 def bookingPage():
     form = BookingForm();
     title = "Book a time"
+    sesh = readSlots(request.cookies.get('personalID'))
     if form.validate_on_submit():
         print(form.datum.data)
         print(form.submit3.data)
         print(form.submit2.data)
         print(form.submit1.data)
-    return render_template('bookingPage.html', form = form, title=title, sessions = session)
+        return redirect(url_for('dashMain'))
+    return render_template('bookingPage.html', form = form, title=title, session = sesh)
 
-@app.route('/dashboard')
+@app.route('/dashboard', methods=['GET', 'POST'])
 def dashMain():
     title = "Dashboard"
-    readSlots()
-    return render_template('dashMain.html', title = title, sessions = session)
+    sesh = readSlots(request.cookies.get('personalID'))
+    return render_template('dashMain.html', title=title, session = sesh)
 
 @app.route('/history')
 def historyPage():

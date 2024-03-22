@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang = "en">
-
+<script>
+    function ExecPythonCommand(pythonCommand){
+        fetch(pythonCommand)
+    }
+</script>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,21 +21,27 @@
     <body>
         <div class = "container">
             <div class = "sidebar">
-                <button class= "btn" type="button" onclick="window.location.href='/dashboard'">Dashboard</button>
-                <button class= "btn" type="button" onclick="window.location.href='/booking'">Book Now</button>
-                <button class= "btn" type="button" onclick="window.location.href='/history'">History</button>
+                <form action="{{ url_for('dashMain') }}" method="post">
+                    <button class= "btn" type="submit">Dashboard</button>
+                </form>
+                <form action="{{ url_for('bookingPage') }}" method="post">
+                    <button class= "btn" type="submit">Book Now</button>
+                </form>
+                <form action="{{ url_for('dashMain') }}" method="post">
+                    <button class= "btn" type="submit">History</button>
+                </form>
                 <div class="bookedTimes">
                     <h2>
                         Next Sessions
                     </h2>
                     <p style="margin:20px">
-                        {{sessions[0]}}
+                        {{session[0]}}
                     </p>
                     <p style="margin:20px">
-                        {{sessions[1]}}
+                        {{session[1]}}
                     </p>
                     <p style="margin:20px">
-                        {{sessions[2]}}
+                        {{session[2]}}
                     </p>
                 </div>
                 <button class= "btn" type="button" style="margin-top: auto;" onclick="window.location.href='/login'">Log Out</button>
