@@ -5,6 +5,11 @@ from pymongo.server_api import ServerApi
 from bson import ObjectId
 import os
 import json
+import calendar
+import plotly
+import plotly.express as px
+import plotly.graph_objects as go
+import pandas as pd
 app = Flask(__name__)
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -22,11 +27,51 @@ db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
 
-# def readRecentCharges():
+def readRecentCharges(id):
+    docMaster = colData.find_one({"_id": ObjectId(id)})
+    doc = docMaster["recent-charges"]
+    dataX = doc["data"]
+    dataX = dataX.split(" ")
+    for i in range(len(dataX)):
+        dataX[i] = int(dataX[i])
+    dataY = []
+    for i in range (int(doc["days"]), 0, -1):
+        dataY.append(i)
+    df = pd.DataFrame(dict(x = dataX, y = dataY))
+    df.sort_values(by="y")
+    fig = px.line(df, x="y", y = "x", title = f"Recent {int(doc["days"])} charges", markers = True)
+    fig.write_image("static/images/fig1.png")
     
+    return fig
 # def readRecentPrices():
     
-# def readHistory():
+def readHistory(id):
+    docMaster = colData.find_one({"_id": ObjectId(id)})
+    doc = docMaster["history"]
+    months = doc["month"]
+    days = doc["day"]
+    TOD = doc["TOD"]
+    paid = doc["paid"]
+    months = months.split()
+    days = days.split()
+    TOD = TOD.split()
+    paid = paid.split()
+    card = []
+    content = []
+    for i in range(len(days)):
+        card.append(calendar.month_name[int(months[i])])
+        card.append(days[i])
+        if TOD[i] == 'F':
+            card.append('Off Peak')
+        elif TOD[i] == 'M':
+            card.append('Mid Peak')
+        elif TOD[i] == 'N':
+            card.append('On Peak')
+        card.append(paid[i])
+        content.append(card)
+        card = []
+    print(content)
+    return content
     
 def readSlots(id):
     docMaster = colData.find_one({"_id": ObjectId(id)})
@@ -53,32 +98,7 @@ def readSlots(id):
             time = time[:2] + ':' + time[2:] + "PM"
         else:
             time = time[:2] + ':' + time[2:] + "PM"
-        match month:
-            case '1': 
-                month = "January"
-            case '2': 
-                month = "February"
-            case '3': 
-                month = "March"
-            case '4': 
-                month = "April"
-            case '5': 
-                month = "May"
-            case '6': 
-                month = "June"
-            case '7': 
-                month = "July"
-            case '8': 
-                month = "August"
-            case '9': 
-                month = "September"
-            case '10': 
-                month = "October"
-            case '11': 
-                month = "November"
-            case '12': 
-                month = "December"
-        message = month + " " + day + ", " + time
+        message = calendar.month_name[int(month)] + " " + day + ", " + time
         if len(session) == 0:
             session.append(message)
     if slot2["month"] != "":
@@ -97,32 +117,7 @@ def readSlots(id):
             time = time[:2] + ':' + time[2:] + "PM"
         else:
             time = time[:2] + ':' + time[2:] + "PM"
-        match month:
-            case '1': 
-                month = "January"
-            case '2': 
-                month = "February"
-            case '3': 
-                month = "March"
-            case '4': 
-                month = "April"
-            case '5': 
-                month = "May"
-            case '6': 
-                month = "June"
-            case '7': 
-                month = "July"
-            case '8': 
-                month = "August"
-            case '9': 
-                month = "September"
-            case '10': 
-                month = "October"
-            case '11': 
-                month = "November"
-            case '12': 
-                month = "December"
-        message = month + " " + day + ", " + time
+        message = calendar.month_name[int(month)] + " " + day + ", " + time
         if len(session) == 1:
             session.append(message)
     if slot3["month"] != "":
@@ -140,32 +135,7 @@ def readSlots(id):
             time = time[:2] + ':' + time[2:] + "PM"
         else:
             time = time[:2] + ':' + time[2:] + "PM"
-        match month:
-            case '1': 
-                month = "January"
-            case '2': 
-                month = "February"
-            case '3': 
-                month = "March"
-            case '4': 
-                month = "April"
-            case '5': 
-                month = "May"
-            case '6': 
-                month = "June"
-            case '7': 
-                month = "July"
-            case '8': 
-                month = "August"
-            case '9': 
-                month = "September"
-            case '10': 
-                month = "October"
-            case '11': 
-                month = "November"
-            case '12': 
-                month = "December"
-        message = month + " " + day + ", " + time
+        message = calendar.month_name[int(month)] + " " + day + ", " + time
         if len(session) == 2:
             session.append(message)
     return session
@@ -228,11 +198,16 @@ def bookingPage():
 def dashMain():
     title = "Dashboard"
     sesh = readSlots(request.cookies.get('personalID'))
-    return render_template('dashMain.html', title=title, session = sesh)
+    fig = readRecentCharges(request.cookies.get('personalID'))
+    return render_template('dashMain.html', title=title, session = sesh, fig = fig)
 
-@app.route('/history')
+@app.route('/history', methods=['GET', 'POST'])
 def historyPage():
-    return render_template('bookingPage.html')
+    title = "History"
+    cont = readHistory(request.cookies.get('personalID'))
+    # cont = [['1', '1', 'F', '3.5']]
+    sesh = readSlots(request.cookies.get('personalID'))
+    return render_template('historyPage.html', title = title, content = cont, session = sesh)
 
 if __name__ == '__main__':
     app.run(debug=True)

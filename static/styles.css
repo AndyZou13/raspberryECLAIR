@@ -111,6 +111,7 @@ body {
     margin: 10px 5px;
 }
 
+
 .bookingContainer {
     float: left;
     display: flex;
@@ -203,6 +204,57 @@ body {
     border-radius: 10px;
     padding: 15px 15px;
     margin-right: 20px;
+}
+
+.history {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 20px;
+    margin-right: 20px;
+    position: relative;
+    overflow: auto;
+}
+
+.history .content {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 150px;
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, .2);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 0 10px rgba(0,0,0,.2);
+    color: #fff;
+    border-radius: 10px;
+    padding: 30px 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+}
+
+.history .content .first {
+    float: left;
+    position: relative;
+    margin-right: auto;
+}
+
+.history .content .middle {
+    float: middle;
+    position: relative;
+    margin-left: auto;
+}
+
+.history .content .last {
+    float: right;
+    position: relative;
+    margin-left: auto;
 }
 .wrapper h1 { 
     font-size: 36px;

@@ -9,9 +9,10 @@
       "data": ""
     },
     "history": {
-      "week": "",
+      "month": "",
       "day": "",
-      "TOD": ""
+      "TOD": "",
+      "paid": ""
     },
     "booked": {
       "slot1": {

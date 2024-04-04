@@ -1,10 +1,5 @@
 <!DOCTYPE html>
 <html lang = "en">
-<script>
-    function ExecPythonCommand(pythonCommand){
-        fetch(pythonCommand)
-    }
-</script>
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -27,7 +22,7 @@
                 <form action="{{ url_for('bookingPage') }}" method="post">
                     <button class= "btn" type="submit">Book Now</button>
                 </form>
-                <form action="{{ url_for('dashMain') }}" method="post">
+                <form action="{{ url_for('historyPage') }}" method="post">
                     <button class= "btn" type="submit">History</button>
                 </form>
                 <div class="bookedTimes">
