@@ -1,5 +1,9 @@
 {% extends "dashboard.html" %}
 {% block content %}
+<head>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
 <form style="height:100%" method="POST" action="">
     <div class="bookingContainer">
         {{ form.hidden_tag() }}

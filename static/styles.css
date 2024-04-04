@@ -111,6 +111,12 @@ body {
     margin: 10px 5px;
 }
 
+.container .main .graphContainer .graph {
+    height: 100%;
+    width: 100%;
+    background: #FFFFFF
+}
+
 
 .bookingContainer {
     float: left;

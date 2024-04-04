@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, flash, make_response, request
+from flask import Flask, render_template, url_for, redirect, flash, make_response, request, jsonify
 from forms import RegistrationForm, LoginForm, BookingForm
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
@@ -10,11 +10,20 @@ import plotly
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
+import stripe
+
 app = Flask(__name__)
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 # app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
 app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
+
+stripeKeys = {
+    "secret_key": 'sk_test_51Ou2ppKySml2ekNAVRVYHbeAiiAx9FR48HW0ZG3Ppx1NvZIBzEhnvnmhEfCWZCWwYMOLphXpClfwNiBLfV8IA4Mp00uISbXiHj',
+    "publishable_key": 'pk_test_51Ou2ppKySml2ekNAvQ4TTTCUmCeZ4NDYqIZHFqtHrLYGp5rBGDrHZC3yjkejgqYwgnikhxeZ56hQuI5PfmZsDwN200QH7y4PJQ'
+    ,
+}
+
 client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
 
 try:
@@ -205,9 +214,35 @@ def dashMain():
 def historyPage():
     title = "History"
     cont = readHistory(request.cookies.get('personalID'))
-    # cont = [['1', '1', 'F', '3.5']]
     sesh = readSlots(request.cookies.get('personalID'))
     return render_template('historyPage.html', title = title, content = cont, session = sesh)
 
+@app.route('/config')
+def get_publishable_key():
+    stripe_config = {"publicKey": stripeKeys["publishable_key"]}
+    return jsonify(stripe_config)
+
+
+@app.route("/create-checkout-session", methods=['GET', 'POST'])
+def create_checkout_session():
+    domain_url = "http://127.0.0.1:5000/"
+    stripe.api_key = stripeKeys["secret_key"]
+    try:
+        checkout_session = stripe.checkout.Session.create(
+            success_url=domain_url + "success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=domain_url + "cancelled",
+            payment_method_types=["card"],
+            mode="payment",
+            line_items=[
+                {
+                    "price" : "price_1P1tCSKySml2ekNAlPn57mVE",
+                    "quantity" : "1"
+                }
+            ]
+        )
+        return jsonify({"sessionId": checkout_session["id"]})
+    except Exception as e:
+        return jsonify(error=str(e)), 403
+    
 if __name__ == '__main__':
     app.run(debug=True)
