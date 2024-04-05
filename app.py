@@ -21,7 +21,6 @@ app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
 stripeKeys = {
     "secret_key": 'sk_test_51Ou2ppKySml2ekNAVRVYHbeAiiAx9FR48HW0ZG3Ppx1NvZIBzEhnvnmhEfCWZCWwYMOLphXpClfwNiBLfV8IA4Mp00uISbXiHj',
     "publishable_key": 'pk_test_51Ou2ppKySml2ekNAvQ4TTTCUmCeZ4NDYqIZHFqtHrLYGp5rBGDrHZC3yjkejgqYwgnikhxeZ56hQuI5PfmZsDwN200QH7y4PJQ'
-    ,
 }
 
 client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
@@ -196,11 +195,14 @@ def bookingPage():
     title = "Book a time"
     sesh = readSlots(request.cookies.get('personalID'))
     if form.validate_on_submit():
-        print(form.datum.data)
-        print(form.submit3.data)
-        print(form.submit2.data)
-        print(form.submit1.data)
-        return redirect(url_for('dashMain'))
+        resp = make_response(redirect(url_for('create_checkout_session')))
+        if form.submit3.data == True:
+            resp.set_cookie('chargeLevel', "price_1P23JJKySml2ekNAeAp8XVRe") 
+        if form.submit2.data == True:
+            resp.set_cookie('chargeLevel', "price_1P23JUKySml2ekNAnLxJ79J4") 
+        if form.submit1.data == True:
+            resp.set_cookie('chargeLevel', "price_1P23JeKySml2ekNAp6UZ5DHq") 
+        return resp
     return render_template('bookingPage.html', form = form, title=title, session = sesh)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
@@ -230,12 +232,12 @@ def create_checkout_session():
     try:
         checkout_session = stripe.checkout.Session.create(
             success_url=domain_url + "success?session_id={CHECKOUT_SESSION_ID}",
-            cancel_url=domain_url + "cancelled",
+            cancel_url=domain_url + "dashboard",
             payment_method_types=["card"],
             mode="payment",
             line_items=[
                 {
-                    "price" : "price_1P1tCSKySml2ekNAlPn57mVE",
+                    "price" : request.cookies.get('chargeLevel'),
                     "quantity" : "1"
                 }
             ]
