@@ -127,7 +127,7 @@ def readSlots(id):
         if len(session) == 2:
             session.append(message)
     return session
-
+    
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def loginPage():
@@ -178,10 +178,13 @@ def bookingPage():
     resp.set_cookie('amount', '', expires=0) 
     now = datetime.datetime.now().hour
     if now >= 19 or now <= 7:
+        resp.set_cookie('TOD', 'off')
         resp.set_cookie('chargeLevel', 'price_1P23JeKySml2ekNAp6UZ5DHq') 
     elif (now > 7 and now <= 11) or (now >= 17 and now < 19):
+        resp.set_cookie('TOD', 'on')
         resp.set_cookie('chargeLevel', 'price_1P23JJKySml2ekNAeAp8XVRe')
     elif now > 11 or now < 17:
+        resp.set_cookie('TOD', 'mid')
         resp.set_cookie('chargeLevel', 'price_1P23JUKySml2ekNAnLxJ79J4')
     if form.validate_on_submit():
         selected = (float)(request.form.get('duration'))
@@ -192,12 +195,20 @@ def bookingPage():
             resp.set_cookie('amount', f'{math.trunc(10*selected)}')
         elif form.submit1.data == True:
             resp.set_cookie('amount', f'{math.trunc(8*selected)}')
+        resp.set_cookie('time', (str)(form.datum.data))
         return resp
     return resp
 
 @app.route('/confirmPage', methods=['GET', 'POST'])
 def confirmPage():
-    return redirect(url_for('create_checkout_session'))
+    arr = []
+    arr.append(request.cookies.get('amount'))
+    arr.append(request.cookies.get('TOD'))
+    arr.append(request.cookies.get('time'))
+    title = "Confirm Order"
+    if request.method == 'POST':
+        return redirect(url_for('create_checkout_session'))
+    return render_template('confirmPage.html', arr = arr, title = title)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashMain():
@@ -217,14 +228,23 @@ def get_publishable_key():
     stripe_config = {"publicKey": stripeKeys["publishable_key"]}
     return jsonify(stripe_config)
 
-
-@app.route("/create-checkout-session", methods=['GET', 'POST'])
+@app.route('/success')
+def paymentSuccess():
+    time = datetime.strptime(request.cookies.get('time'), '%m/%d/%y %H:%M:%S')
+    docMaster = colData.find_one({"_id": request.cookies.get('personalID')})
+    doc = docMaster["booked"]
+    slot1 = doc["slot1"]
+    slot2 = doc["slot2"]
+    slot3 = doc["slot3"]
+    if slot1 == None:
+        slot1['month'] = time.strftime("%B")
+@app.route('/create-checkout-session', methods=['GET', 'POST'])
 def create_checkout_session():
     domain_url = "http://127.0.0.1:5000/"
     stripe.api_key = stripeKeys["secret_key"]
     try:
         checkout_session = stripe.checkout.Session.create(
-            success_url=domain_url + "success?session_id={CHECKOUT_SESSION_ID}",
+            success_url=domain_url + "success",
             cancel_url=domain_url + "dashboard",
             payment_method_types=["card"],
             mode="payment",

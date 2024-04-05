@@ -1,0 +1,12 @@
+{% extends "loginLayout.html" %}
+{% block content %}
+<div class = "wrapper">
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+    <form id="bookingForm" method="POST" action="">
+        {{ arr[0] }}
+        {{ arr[1] }}
+        {{ arr[2] }}
+        <input type='submit' name='submit' id="submit">
+    </form>
+</div>
+{% endblock content %}

@@ -1,7 +1,16 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, BooleanField, DateTimeLocalField
-from wtforms.validators import DataRequired, Length, EqualTo
+from wtforms.validators import DataRequired, Length, EqualTo, StopValidation
+from datetime import datetime
 
+def checkTime(form, field):
+    now = datetime.now()
+    print(now)
+    print(field.data)
+    if field.data < now:
+        field.errors[:] = []
+        raise StopValidation('This field is required.')
+    
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=5, max=20)])
     password = StringField('Password', validators=[DataRequired()])
@@ -15,7 +24,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
     
 class BookingForm(FlaskForm):
-    datum = DateTimeLocalField('Datum', validators=[DataRequired()])
+    datum = DateTimeLocalField('Datum', validators=[DataRequired(), checkTime])
     submit3 = SubmitField('Tier 3 \n 48 amps max output \n 11.5kW of power per hour')
     submit2 = SubmitField('Tier 2 \n 40 amps max output \n 9.6kW of power per hour')
     submit1 = SubmitField('Tier 1 \n 32 amps max output \n 7.7kW of power per hour')
