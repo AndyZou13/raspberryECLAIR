@@ -6,12 +6,10 @@ from bson import ObjectId
 import os
 import json
 import calendar
-import plotly
-import plotly.express as px
-import plotly.graph_objects as go
-import pandas as pd
 import stripe
-
+import math
+import datetime
+import time
 app = Flask(__name__)
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -35,24 +33,6 @@ db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
 
-def readRecentCharges(id):
-    docMaster = colData.find_one({"_id": ObjectId(id)})
-    doc = docMaster["recent-charges"]
-    dataX = doc["data"]
-    dataX = dataX.split(" ")
-    for i in range(len(dataX)):
-        dataX[i] = int(dataX[i])
-    dataY = []
-    for i in range (int(doc["days"]), 0, -1):
-        dataY.append(i)
-    df = pd.DataFrame(dict(x = dataX, y = dataY))
-    df.sort_values(by="y")
-    fig = px.line(df, x="y", y = "x", title = f"Recent {int(doc["days"])} charges", markers = True)
-    fig.write_image("static/images/fig1.png")
-    
-    return fig
-# def readRecentPrices():
-    
 def readHistory(id):
     docMaster = colData.find_one({"_id": ObjectId(id)})
     doc = docMaster["history"]
@@ -194,23 +174,36 @@ def bookingPage():
     form = BookingForm();
     title = "Book a time"
     sesh = readSlots(request.cookies.get('personalID'))
+    resp = make_response(render_template('bookingPage.html',  form = form, title=title, session = sesh)) 
+    resp.set_cookie('amount', '', expires=0) 
+    now = datetime.datetime.now().hour
+    if now >= 19 or now <= 7:
+        resp.set_cookie('chargeLevel', 'price_1P23JeKySml2ekNAp6UZ5DHq') 
+    elif (now > 7 and now <= 11) or (now >= 17 and now < 19):
+        resp.set_cookie('chargeLevel', 'price_1P23JJKySml2ekNAeAp8XVRe')
+    elif now > 11 or now < 17:
+        resp.set_cookie('chargeLevel', 'price_1P23JUKySml2ekNAnLxJ79J4')
     if form.validate_on_submit():
-        resp = make_response(redirect(url_for('create_checkout_session')))
+        selected = (float)(request.form.get('duration'))
+        resp = make_response(redirect(url_for('confirmPage')))
         if form.submit3.data == True:
-            resp.set_cookie('chargeLevel', "price_1P23JJKySml2ekNAeAp8XVRe") 
-        if form.submit2.data == True:
-            resp.set_cookie('chargeLevel', "price_1P23JUKySml2ekNAnLxJ79J4") 
-        if form.submit1.data == True:
-            resp.set_cookie('chargeLevel', "price_1P23JeKySml2ekNAp6UZ5DHq") 
+            resp.set_cookie('amount', f'{math.trunc(12*selected)}')
+        elif form.submit2.data == True: 
+            resp.set_cookie('amount', f'{math.trunc(10*selected)}')
+        elif form.submit1.data == True:
+            resp.set_cookie('amount', f'{math.trunc(8*selected)}')
         return resp
-    return render_template('bookingPage.html', form = form, title=title, session = sesh)
+    return resp
+
+@app.route('/confirmPage', methods=['GET', 'POST'])
+def confirmPage():
+    return redirect(url_for('create_checkout_session'))
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashMain():
     title = "Dashboard"
     sesh = readSlots(request.cookies.get('personalID'))
-    fig = readRecentCharges(request.cookies.get('personalID'))
-    return render_template('dashMain.html', title=title, session = sesh, fig = fig)
+    return render_template('dashMain.html', title=title, session = sesh)
 
 @app.route('/history', methods=['GET', 'POST'])
 def historyPage():
@@ -238,7 +231,7 @@ def create_checkout_session():
             line_items=[
                 {
                     "price" : request.cookies.get('chargeLevel'),
-                    "quantity" : "1"
+                    "quantity" : request.cookies.get('amount')
                 }
             ]
         )
