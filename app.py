@@ -9,7 +9,9 @@ import calendar
 import stripe
 import math
 import datetime
-import time
+from bokeh.plotting import figure
+from bokeh.models import Range1d
+from bokeh.embed import components
 app = Flask(__name__)
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -33,6 +35,31 @@ db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
 
+def graphEverything():
+    x1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    y1 = [0, 8, 2, 4, 6, 9, 5, 6, 25, 28, 4]
+
+    # the red and blue graphs share this data range
+    xr1 = Range1d(start=0, end=30)
+    yr1 = Range1d(start=0, end=30)
+
+    # only the green graph uses this data range
+    xr2 = Range1d(start=0, end=30)
+    yr2 = Range1d(start=0, end=30)
+
+    # build the figures
+    p1 = figure(x_range=xr1, y_range=yr1, width=300, height=300)
+    p1.scatter(x1, y1, size=12, color="red", alpha=0.5)
+    p1.toolbar.logo = None
+    p1.toolbar_location = None
+    # plots can be a single Bokeh model, a list/tuple, or even a dictionary
+    plots = {'Red': p1}
+
+    script, div = components(plots)
+    print(script)
+    print(div)
+    return script, div
+    
 def readHistory(id):
     docMaster = colData.find_one({"_id": ObjectId(id)})
     doc = docMaster["history"]
@@ -128,6 +155,7 @@ def readSlots(id):
             session.append(message)
     return session
     
+script, divs = graphEverything()
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def loginPage():
@@ -214,7 +242,7 @@ def confirmPage():
 def dashMain():
     title = "Dashboard"
     sesh = readSlots(request.cookies.get('personalID'))
-    return render_template('dashMain.html', title=title, session = sesh)
+    return render_template('dashMain.html', title=title, session = sesh, script = script, div = divs)
 
 @app.route('/history', methods=['GET', 'POST'])
 def historyPage():

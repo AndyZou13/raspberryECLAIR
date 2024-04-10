@@ -1,9 +1,12 @@
 {% extends "dashboard.html" %}
 {% block content %}
+<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js"></script>
+{{ script|safe }}
     <div class="graphContainer">
-        
+        {{div['Red'] |safe}}
     </div>
     <div class="graphContainer">
-        <iframe class = "graph" src="https://charts.mongodb.com/charts-project-0-txrch/embed/charts?id=660ee755-5eb3-44d6-821a-c5c8417fbf7b&maxDataAge=60&theme=light&autoRefresh=true"></iframe>
+        {{div['Blue']|safe}}
+        {{div['Green']|safe}}
     </div>
 {% endblock content %}
