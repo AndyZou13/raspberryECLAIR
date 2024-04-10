@@ -25,6 +25,6 @@ class LoginForm(FlaskForm):
     
 class BookingForm(FlaskForm):
     datum = DateTimeLocalField('Datum', validators=[DataRequired(), checkTime])
-    submit3 = SubmitField('Tier 3 \n 48 amps max output \n 11.5kW of power per hour')
-    submit2 = SubmitField('Tier 2 \n 40 amps max output \n 9.6kW of power per hour')
-    submit1 = SubmitField('Tier 1 \n 32 amps max output \n 7.7kW of power per hour')
+    submit3 = SubmitField('Tier 3 \n 48 amps max output \n 12kW of power per hour')
+    submit2 = SubmitField('Tier 2 \n 40 amps max output \n 10kW of power per hour')
+    submit1 = SubmitField('Tier 1 \n 32 amps max output \n 8kW of power per hour')

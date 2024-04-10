@@ -3,10 +3,19 @@
 <div class = "wrapper">
     <script src="{{ url_for('static', filename='main.js') }}"></script>
     <form id="bookingForm" method="POST" action="">
-        {{ arr[0] }}
-        {{ arr[1] }}
-        {{ arr[2] }}
-        <input type='submit' name='submit' id="submit">
+        <h1>Order Confirmation</h1>
+        <h2>Amount: {{ arr[0] }}kWH</h2>
+        {% if arr[1] == 'off' %}
+        <h2>Price per kWH: $0.10CAD</h2>
+        {% endif %}
+        {% if arr[1] == 'on' %}
+        <h2>Price per kWH: $0.20CAD</h2>
+        {% endif %}
+        {% if arr[1] == 'mid' %}
+        <h2>Price per kWH: $0.15CAD</h2>
+        {% endif %}
+        <h2>Time: {{ arr[2] }}</h2>
+        <input class="btn" type='submit' name='submit' id="submit" value = "Confirm Order">
     </form>
 </div>
 {% endblock content %}

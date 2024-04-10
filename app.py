@@ -34,6 +34,7 @@ except Exception as e:
 db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
+colCal = db["calendar"]
 
 def graphEverything():
     x1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -216,7 +217,7 @@ def bookingPage():
         resp.set_cookie('chargeLevel', 'price_1P23JUKySml2ekNAnLxJ79J4')
     if form.validate_on_submit():
         selected = (float)(request.form.get('duration'))
-        resp = make_response(redirect(url_for('confirmPage')))
+        resp = make_response(redirect(url_for('checkAvailbility')))
         if form.submit3.data == True:
             resp.set_cookie('amount', f'{math.trunc(12*selected)}')
         elif form.submit2.data == True: 
@@ -224,8 +225,22 @@ def bookingPage():
         elif form.submit1.data == True:
             resp.set_cookie('amount', f'{math.trunc(8*selected)}')
         resp.set_cookie('time', (str)(form.datum.data))
+        resp.set_cookie('duration', (str)(selected))
         return resp
     return resp
+
+@app.route('/checkAvailability', methods=['GET', 'POST'])
+def checkAvailability():
+    time = request.cookies.get('time').split(' ')
+    startTime = datetime.datetime.strptime(time[1], '%H:%M:%S')
+    duration = ((float)(request.cookies.get('duration'))) * 30
+    endTime = (startTime + datetime.timedelta(minutes=duration))
+    docMaster = colData.find({"date": time[0]})
+    if docMaster == None:
+        return redirect(url_for('confirmPage'))
+    else:
+        return redirect(url_for('confirmPage'))
+
 
 @app.route('/confirmPage', methods=['GET', 'POST'])
 def confirmPage():
@@ -258,7 +273,7 @@ def get_publishable_key():
 
 @app.route('/success')
 def paymentSuccess():
-    time = datetime.strptime(request.cookies.get('time'), '%m/%d/%y %H:%M:%S')
+    time = request.cookies.get('time').split(' ')
     docMaster = colData.find_one({"_id": request.cookies.get('personalID')})
     doc = docMaster["booked"]
     slot1 = doc["slot1"]
@@ -282,6 +297,7 @@ def create_checkout_session():
                     "quantity" : request.cookies.get('amount')
                 }
             ]
+
         )
         return jsonify({"sessionId": checkout_session["id"]})
     except Exception as e:
