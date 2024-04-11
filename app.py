@@ -31,8 +31,9 @@ stripeKeys = {
 # }
 
 client = MongoClient(os.environ.get('MONGODB_URI'))
-# baseURL = "http://127.0.0.1:5000/"
-baseURl = "http://raspberryeclair.azurewebsites.net/"
+# client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
+# baseURL = "http://127.0.0.1:8000/"
+baseURl = "https://raspberryeclair.azurewebsites.net/"
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")

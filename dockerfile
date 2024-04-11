@@ -12,8 +12,6 @@ WORKDIR /app
 # Copy the dependencies file to the working directory
 COPY requirements.txt .
 
-RUN python -m pip install stripe
-
 # Install any dependencies
 RUN pip install -r requirements.txt
 
@@ -22,4 +20,4 @@ RUN pip install -r requirements.txt
 COPY app.py .
 
 # # Specify the command to run on container start
-# CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8000"]
+CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8000"]
