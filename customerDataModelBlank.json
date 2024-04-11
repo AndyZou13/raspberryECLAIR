@@ -1,18 +1,12 @@
 {
     "_id": "",
-    "recent-charges": {
-      "days": "",
-      "data": ""
-    },
-    "pricesPKWH": {
-      "days": "",
-      "data": ""
-    },
     "history": {
       "month": "",
       "day": "",
       "TOD": "",
-      "paid": ""
+      "paid": "",
+      "pricePKW": "",
+      "recentCharges": ""
     },
     "booked": {
       "slot1": {

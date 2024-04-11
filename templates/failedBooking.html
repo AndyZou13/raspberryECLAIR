@@ -1,0 +1,12 @@
+{% extends "loginLayout.html" %}
+{% block content %}
+<div class = "wrapper">
+    <form id="bookingForm" method="POST" action="">
+        <h1>Booking Failed</h1>
+        <p>
+            Please cancel an existing appointment or reschedule to a different time as the time slot you have requested has already been booked or is overlapping with another time slot.
+        </p>
+        <input class="btn" type='submit' name='submit' id="submit" value = "Return to booking page">
+    </form>
+</div>
+{% endblock content %}

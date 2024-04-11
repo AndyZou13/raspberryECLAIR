@@ -5,8 +5,6 @@ from datetime import datetime
 
 def checkTime(form, field):
     now = datetime.now()
-    print(now)
-    print(field.data)
     if field.data < now:
         field.errors[:] = []
         raise StopValidation('This field is required.')

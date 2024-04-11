@@ -102,6 +102,8 @@ body {
 .container .main .graphContainer {
     height: 50%;
     width: 100%;
+    display: flex;
+    flex-direction: row;
     background: transparent;
     border: 2px solid rgba(255, 255, 255, .2);
     backdrop-filter: blur(20px);
@@ -110,14 +112,13 @@ body {
     border-radius: 10px;
     padding: 30px 30px;
     margin: 10px 5px;
+    position: relative;
 }
 
-.container .main .graphContainer .graph {
-    height: 100%;
-    width: 100%;
-    background: #FFFFFF
+.container .main .graphContainer > div > div{
+    margin-left: 60px;
+    margin-right: 60px;
 }
-
 
 .bookingContainer {
     float: left;

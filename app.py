@@ -9,9 +9,12 @@ import calendar
 import stripe
 import math
 import datetime
+import pandas as pd
+import hashlib
+from datetime import datetime as dt
 from bokeh.plotting import figure
-from bokeh.models import Range1d
 from bokeh.embed import components
+from bokeh.models import DatetimeTickFormatter, HoverTool
 app = Flask(__name__)
 
 # app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
@@ -24,7 +27,8 @@ stripeKeys = {
 }
 
 client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
-
+baseURL = "http://127.0.0.1:5000/"
+# baseURl = "http://raspberryeclair.azurewebsites.net/"
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -36,29 +40,68 @@ colUsers = db["users"]
 colData = db["data"]
 colCal = db["calendar"]
 
-def graphEverything():
-    x1 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    y1 = [0, 8, 2, 4, 6, 9, 5, 6, 25, 28, 4]
-
-    # the red and blue graphs share this data range
-    xr1 = Range1d(start=0, end=30)
-    yr1 = Range1d(start=0, end=30)
-
-    # only the green graph uses this data range
-    xr2 = Range1d(start=0, end=30)
-    yr2 = Range1d(start=0, end=30)
-
-    # build the figures
-    p1 = figure(x_range=xr1, y_range=yr1, width=300, height=300)
-    p1.scatter(x1, y1, size=12, color="red", alpha=0.5)
+def graphData(id):
+    docMaster = colData.find_one({"_id": ObjectId(id)})
+    hist = docMaster['history']
+    months = hist['month'].split(' ')
+    days = hist['day'].split(' ')
+    if hist['month'] == "":
+        return None, None
+    x = []
+    for i in range(len(months)):
+        x.append(dt(2024, int(months[i]), int(days[i])))
+    y1 = hist['pricePKW'].split(' ')
+    for i in range(len(y1)):
+        y1[i] = int(y1[i])
+    y2 = hist['recentCharges'].split(' ')
+    for i in range(len(y2)):
+        y2[i] = int(y2[i])
+    xLabels1 = []
+    for i in range(len(x)):
+        xLabels1.append(x[i].strftime('%Y-%m-%d') + ' | ' + str(y1[i]) + 'cents')
+    xLabels2 = []
+    for i in range(len(x)):
+        xLabels2.append(x[i].strftime('%Y-%m-%d') + ' | ' + str(y2[i]) + 'kWh')
+    df1 = pd.DataFrame({'x': x, 
+                     'y': y1,
+                     'labels': xLabels1})
+    df2 = pd.DataFrame({'x': x, 
+                     'y': y2,
+                     'labels': xLabels2})
+    p1 = figure(sizing_mode='stretch_height', x_axis_type="datetime", title='Recently Charged Prices in Cents')
+    p1.line(x = 'x', y = 'y', source = df1)
+    p1.scatter(x = 'x', y = 'y', source = df1)
+    p1.xaxis.formatter=DatetimeTickFormatter(
+        hours=["%d %B %Y"],
+        days=["%d %B %Y"],
+        months=["%d %B %Y"],
+        years=["%d %B %Y"],
+    )
+    p1.xaxis.axis_label = "Date"
+    p1.yaxis.axis_label = "price per kWh (cents)"
     p1.toolbar.logo = None
     p1.toolbar_location = None
-    # plots can be a single Bokeh model, a list/tuple, or even a dictionary
-    plots = {'Red': p1}
+    hover = HoverTool(tooltips=[('Label', '@labels')]) 
+    p1.add_tools(hover)
+    
+    p2 = figure(sizing_mode='stretch_height', x_axis_type="datetime", title='Recently Charged in Kilowatts')
+    p2.line(x = 'x', y = 'y', source = df2)
+    p2.scatter(x = 'x', y = 'y', source = df2)
+    p2.xaxis.formatter=DatetimeTickFormatter(
+        hours=["%d %B %Y"],
+        days=["%d %B %Y"],
+        months=["%d %B %Y"],
+        years=["%d %B %Y"],
+    )
+    p2.xaxis.axis_label = "Date"
+    p2.yaxis.axis_label = "Kilowatt per hour"
+    p2.toolbar.logo = None
+    p2.toolbar_location = None
+    hover = HoverTool(tooltips=[('Label', '@labels')]) 
+    p2.add_tools(hover)
+    plots = {'pricePKW': p1, 'recentCharges': p2}
 
     script, div = components(plots)
-    print(script)
-    print(div)
     return script, div
     
 def readHistory(id):
@@ -86,7 +129,6 @@ def readHistory(id):
         card.append(paid[i])
         content.append(card)
         card = []
-    print(content)
     return content
     
 def readSlots(id):
@@ -102,18 +144,6 @@ def readSlots(id):
         month = slot1["month"]
         day = slot1["day"]
         time = slot1["time"]
-        time = int(time)
-        if time > 1300:
-            time = time - 1200
-            time = str(time)
-            while len(time) < 3:
-                time = "0" + time
-            time = time[:2] + ':' + time[2:] + "PM"
-        elif time < 1300 and time >= 1200:
-            time = str(time)
-            time = time[:2] + ':' + time[2:] + "PM"
-        else:
-            time = time[:2] + ':' + time[2:] + "PM"
         message = calendar.month_name[int(month)] + " " + day + ", " + time
         if len(session) == 0:
             session.append(message)
@@ -121,18 +151,6 @@ def readSlots(id):
         month = slot2["month"]
         day = slot2["day"]
         time = slot2["time"]
-        time = int(time)
-        if time > 1300:
-            time = time - 1200
-            time = str(time)
-            while len(time) < 3:
-                time = "0" + time
-            time = time[:2] + ':' + time[2:] + "PM"
-        elif time < 1300 and time >= 1200:
-            time = str(time)
-            time = time[:2] + ':' + time[2:] + "PM"
-        else:
-            time = time[:2] + ':' + time[2:] + "PM"
         message = calendar.month_name[int(month)] + " " + day + ", " + time
         if len(session) == 1:
             session.append(message)
@@ -140,23 +158,11 @@ def readSlots(id):
         month = slot3["month"]
         day = slot3["day"]
         time = slot3["time"]
-        if time > 1300:
-            time = time - 1200
-            time = str(time)
-            while len(time) < 3:
-                time = "0" + time
-            time = time[:2] + ':' + time[2:] + "PM"
-        elif time < 1300 and time >= 1200:
-            time = str(time)
-            time = time[:2] + ':' + time[2:] + "PM"
-        else:
-            time = time[:2] + ':' + time[2:] + "PM"
         message = calendar.month_name[int(month)] + " " + day + ", " + time
         if len(session) == 2:
             session.append(message)
     return session
     
-script, divs = graphEverything()
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/login', methods=['GET', 'POST'])
 def loginPage():
@@ -165,11 +171,12 @@ def loginPage():
     resp = make_response(render_template('login.html', form = form, title=title))
     resp.set_cookie('personalID', '', expires=0) 
     if form.validate_on_submit():
-        query = {"username" : form.username.data}
+        
+        query = {"username" : hashlib.sha256(form.username.data.encode('utf-8')).hexdigest()}
         doc = colUsers.find_one(query)
         if doc:
             p=doc["password"]
-            if form.password.data == p:
+            if hashlib.sha256(form.password.data.encode('utf-8')).hexdigest() == p:
                 id = doc["_id"]
                 resp = make_response(redirect(url_for('dashMain')))
                 resp.set_cookie('personalID', str(id)) 
@@ -181,12 +188,12 @@ def registerPage():
     form = RegistrationForm()
     title = "Register"
     if form.validate_on_submit():
-        query = {"username" : form.username.data}
+        query = {"username" : hashlib.sha256(f'{form.username.data.encode('utf-8')}').hexdigest()}
         doc = colUsers.find_one(query)
         if doc:
             return render_template('register.html', form = form, title=title)
         else :
-            doc = {"username" : form.username.data, "password" : form.password.data}
+            doc = {"username" : hashlib.sha256(form.username.data.encode('utf-8')).hexdigest(), "password" : hashlib.sha256(form.password.data.encode('utf-8')).hexdigest()}
             x = colUsers.insert_one(doc)
             file = []
             with open('customerDataModelBlank.json') as file:
@@ -217,7 +224,7 @@ def bookingPage():
         resp.set_cookie('chargeLevel', 'price_1P23JUKySml2ekNAnLxJ79J4')
     if form.validate_on_submit():
         selected = (float)(request.form.get('duration'))
-        resp = make_response(redirect(url_for('checkAvailbility')))
+        resp = make_response(redirect(url_for('checkAvailability')))
         if form.submit3.data == True:
             resp.set_cookie('amount', f'{math.trunc(12*selected)}')
         elif form.submit2.data == True: 
@@ -231,16 +238,39 @@ def bookingPage():
 
 @app.route('/checkAvailability', methods=['GET', 'POST'])
 def checkAvailability():
-    time = request.cookies.get('time').split(' ')
-    startTime = datetime.datetime.strptime(time[1], '%H:%M:%S')
-    duration = ((float)(request.cookies.get('duration'))) * 30
+    time = request.cookies.get('time')
+    startTime = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+    duration = ((float)(request.cookies.get('duration'))) * 60
     endTime = (startTime + datetime.timedelta(minutes=duration))
-    docMaster = colData.find({"date": time[0]})
-    if docMaster == None:
-        return redirect(url_for('confirmPage'))
-    else:
-        return redirect(url_for('confirmPage'))
+    print('start', startTime)
+    print('end',endTime)
+    docMaster = colCal.find({"date": time.split(' ')[0]})
+    for i in docMaster:
+        timeDif = startTime > datetime.datetime.strptime(i['date'] + " " +i['startTime'], '%Y-%m-%d %H:%M:%S')
+        if timeDif == True:
+            timeDif = startTime < datetime.datetime.strptime(i['date'] + " " +i['endTime'], '%Y-%m-%d %H:%M:%S')
+            if timeDif == True:
+                return redirect(url_for('failedBooking'))
+        timeDif = endTime > datetime.datetime.strptime(i['date'] + " " +i['startTime'], '%Y-%m-%d %H:%M:%S')
+        if timeDif == True:
+            timeDif = endTime < datetime.datetime.strptime(i['date'] + " " +i['endTime'], '%Y-%m-%d %H:%M:%S')
+            if timeDif == True:
+                return redirect(url_for('failedBooking'))
+    docMaster = colData.find_one({"_id": ObjectId(request.cookies.get('personalID'))})
+    doc = docMaster["booked"]
+    slot1 = doc["slot1"]
+    slot2 = doc["slot2"]
+    slot3 = doc["slot3"]
+    if slot1["month"] != "" and slot2["month"] != "" and slot3["month"] != "":
+        return redirect(url_for('failedBooking'))
+    return redirect(url_for('confirmPage'))
 
+@app.route('/failedBooking', methods=['GET', 'POST'])
+def failedBooking():
+    title = "Booking Failed"
+    if request.method == 'POST':
+        return redirect(url_for('bookingPage'))
+    return render_template('failedBooking.html', title = title)
 
 @app.route('/confirmPage', methods=['GET', 'POST'])
 def confirmPage():
@@ -250,13 +280,18 @@ def confirmPage():
     arr.append(request.cookies.get('time'))
     title = "Confirm Order"
     if request.method == 'POST':
-        return redirect(url_for('create_checkout_session'))
+        submitted_value = request.form['submit']
+        if submitted_value == 'Confirm Order':
+            return redirect(url_for('create_checkout_session'))
+        elif submitted_value == 'Back to Dashboard':
+            return redirect(url_for('dashMain'))
     return render_template('confirmPage.html', arr = arr, title = title)
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashMain():
     title = "Dashboard"
     sesh = readSlots(request.cookies.get('personalID'))
+    script, divs = graphData(request.cookies.get('personalID'))
     return render_template('dashMain.html', title=title, session = sesh, script = script, div = divs)
 
 @app.route('/history', methods=['GET', 'POST'])
@@ -273,22 +308,47 @@ def get_publishable_key():
 
 @app.route('/success')
 def paymentSuccess():
-    time = request.cookies.get('time').split(' ')
-    docMaster = colData.find_one({"_id": request.cookies.get('personalID')})
+    time = request.cookies.get('time')
+    startTime = datetime.datetime.strptime(time, '%Y-%m-%d %H:%M:%S')
+    duration = ((float)(request.cookies.get('duration'))) * 60
+    endTime = (startTime + datetime.timedelta(minutes=duration))
+    date = startTime.strftime("%Y-%m-%d")
+    docMaster = colData.find_one({"_id": ObjectId(request.cookies.get('personalID'))})
     doc = docMaster["booked"]
     slot1 = doc["slot1"]
     slot2 = doc["slot2"]
     slot3 = doc["slot3"]
-    if slot1 == None:
-        slot1['month'] = time.strftime("%B")
+    if slot1["month"] == "":
+        slot1["month"] = startTime.strftime("%m")
+        slot1["day"] = startTime.strftime("%d")
+        slot1["time"] = startTime.strftime("%H:%M:%S")
+        print('saved', startTime.strftime("%m"), startTime.strftime("%d"), startTime.strftime("%H:%M:%S"))
+    elif slot2["month"] == "":
+        slot2["month"] = startTime.strftime("%m")
+        slot2["day"] = startTime.strftime("%d")
+        slot2["time"] = startTime.strftime("%H:%M:%S")
+    elif slot3["month"] == "":
+        slot3["month"] = startTime.strftime("%m")
+        slot3["day"] = startTime.strftime("%d")
+        slot3["time"] = startTime.strftime("%H:%M:%S")
+    doc["slot1"] = slot1
+    doc["slot2"] = slot2
+    doc["slot3"] = slot3
+    docMaster["booked"] = doc
+    newVal = { "$set" : docMaster}
+    colData.update_one({"_id": ObjectId(request.cookies.get('personalID'))}, newVal)
+    doc = {'date': date, 'startTime': startTime.strftime("%H:%M:%S"), 'endTime': endTime.strftime("%H:%M:%S")}
+    colCal.insert_one(doc)
+    return redirect(url_for('dashMain'))
+
 @app.route('/create-checkout-session', methods=['GET', 'POST'])
 def create_checkout_session():
-    domain_url = "http://127.0.0.1:5000/"
+    domain_url = baseURL
     stripe.api_key = stripeKeys["secret_key"]
     try:
         checkout_session = stripe.checkout.Session.create(
             success_url=domain_url + "success",
-            cancel_url=domain_url + "dashboard",
+            cancel_url=domain_url + "failedBooking",
             payment_method_types=["card"],
             mode="payment",
             line_items=[

@@ -1,12 +1,10 @@
 {% extends "dashboard.html" %}
 {% block content %}
-<script src="https://cdn.bokeh.org/bokeh/release/bokeh-3.4.0.min.js"></script>
 {{ script|safe }}
     <div class="graphContainer">
-        {{div['Red'] |safe}}
+        {{div['pricePKW'] |safe}}
+        {{div['recentCharges'] |safe}}
     </div>
     <div class="graphContainer">
-        {{div['Blue']|safe}}
-        {{div['Green']|safe}}
     </div>
 {% endblock content %}
