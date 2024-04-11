@@ -17,18 +17,22 @@ from bokeh.embed import components
 from bokeh.models import DatetimeTickFormatter, HoverTool
 app = Flask(__name__)
 
-# app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-# app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
-app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
+app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
+# app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
 
 stripeKeys = {
-    "secret_key": 'sk_test_51Ou2ppKySml2ekNAVRVYHbeAiiAx9FR48HW0ZG3Ppx1NvZIBzEhnvnmhEfCWZCWwYMOLphXpClfwNiBLfV8IA4Mp00uISbXiHj',
-    "publishable_key": 'pk_test_51Ou2ppKySml2ekNAvQ4TTTCUmCeZ4NDYqIZHFqtHrLYGp5rBGDrHZC3yjkejgqYwgnikhxeZ56hQuI5PfmZsDwN200QH7y4PJQ'
+    "secret_key": os.environ.get('STRIPE_SECRET'),
+    "publishable_key": os.environ.get('STRIPE_PUBLIC')
 }
+# stripeKeys = {
+#     "secret_key": 'sk_test_51Ou2ppKySml2ekNAVRVYHbeAiiAx9FR48HW0ZG3Ppx1NvZIBzEhnvnmhEfCWZCWwYMOLphXpClfwNiBLfV8IA4Mp00uISbXiHj',
+#     "publishable_key": 'pk_test_51Ou2ppKySml2ekNAvQ4TTTCUmCeZ4NDYqIZHFqtHrLYGp5rBGDrHZC3yjkejgqYwgnikhxeZ56hQuI5PfmZsDwN200QH7y4PJQ'
+# }
 
 client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
-baseURL = "http://127.0.0.1:5000/"
-# baseURl = "http://raspberryeclair.azurewebsites.net/"
+# baseURL = "http://127.0.0.1:5000/"
+baseURl = "http://raspberryeclair.azurewebsites.net/"
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
