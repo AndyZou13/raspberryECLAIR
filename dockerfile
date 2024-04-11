@@ -1,9 +1,9 @@
-syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
 # Set base image (host OS)
 FROM python:3.12
 
-# By default, listen on port 5000
+# Expose port 8000 for the application
 EXPOSE 8000/tcp
 
 # Set the working directory in the container
@@ -19,4 +19,4 @@ RUN pip install -r requirements.txt
 COPY app.py .
 
 # Specify the command to run on container start
-CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]
+CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0", "--port=8000"]

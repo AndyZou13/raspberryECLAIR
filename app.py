@@ -30,7 +30,7 @@ stripeKeys = {
 #     "publishable_key": 'pk_test_51Ou2ppKySml2ekNAvQ4TTTCUmCeZ4NDYqIZHFqtHrLYGp5rBGDrHZC3yjkejgqYwgnikhxeZ56hQuI5PfmZsDwN200QH7y4PJQ'
 # }
 
-client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
+client = MongoClient(os.environ.get('MONGODB_URI'))
 # baseURL = "http://127.0.0.1:5000/"
 baseURl = "http://raspberryeclair.azurewebsites.net/"
 try:
