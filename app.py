@@ -19,21 +19,23 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 app.config['MONGODB_URI'] = os.environ.get('MONGODB_URI')
-# app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
 
 stripeKeys = {
     "secret_key": os.environ.get('STRIPE_SECRET'),
     "publishable_key": os.environ.get('STRIPE_PUBLIC')
 }
+
+client = MongoClient(os.environ.get('MONGODB_URI'))
+baseURL = "https://raspberryeclair.azurewebsites.net/"
+
+# app.config['SECRET_KEY'] = "163c1af8b4a801e8fddec7e72b6db4dd"
 # stripeKeys = {
 #     "secret_key": 'sk_test_51Ou2ppKySml2ekNAVRVYHbeAiiAx9FR48HW0ZG3Ppx1NvZIBzEhnvnmhEfCWZCWwYMOLphXpClfwNiBLfV8IA4Mp00uISbXiHj',
 #     "publishable_key": 'pk_test_51Ou2ppKySml2ekNAvQ4TTTCUmCeZ4NDYqIZHFqtHrLYGp5rBGDrHZC3yjkejgqYwgnikhxeZ56hQuI5PfmZsDwN200QH7y4PJQ'
 # }
-
-client = MongoClient(os.environ.get('MONGODB_URI'))
 # client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
 # baseURL = "http://127.0.0.1:8000/"
-baseURL = "https://raspberryeclair.azurewebsites.net/"
+
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -44,6 +46,7 @@ db = client["raspberryECLAIR"]
 colUsers = db["users"]
 colData = db["data"]
 colCal = db["calendar"]
+colDataModel = db['dataModels']
 
 def graphData(id):
     docMaster = colData.find_one({"_id": ObjectId(id)})
@@ -193,16 +196,15 @@ def registerPage():
     form = RegistrationForm()
     title = "Register"
     if form.validate_on_submit():
-        query = {"username" : hashlib.sha256(f'{form.username.data.encode('utf-8')}').hexdigest()}
+        query = {"username" : hashlib.sha256(form.username.data.encode('utf-8')).hexdigest()}
         doc = colUsers.find_one(query)
         if doc:
             return render_template('register.html', form = form, title=title)
         else :
             doc = {"username" : hashlib.sha256(form.username.data.encode('utf-8')).hexdigest(), "password" : hashlib.sha256(form.password.data.encode('utf-8')).hexdigest()}
             x = colUsers.insert_one(doc)
-            file = []
-            with open('customerDataModelBlank.json') as file:
-                fileData = json.load(file)
+            fileData = colDataModel.find_one({"_id": ObjectId('66182294f166bef419e850df')})
+            print(fileData)
             fileData.update({"_id" : x.inserted_id})
             colData.insert_one(fileData)
             resp = make_response(redirect(url_for('dashMain')))
