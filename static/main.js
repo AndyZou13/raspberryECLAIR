@@ -5,7 +5,7 @@ fetch("/config")
 .then((data) => {
   const stripe = Stripe(data.publicKey);
   document.querySelector("#bookingForm").addEventListener("submit", () => {
-    fetch("/create-checkout-session")
+    fetch("/create-checkout-session") 
     .then((result) => { return result.json(); })
     .then((data) => {
       console.log(data);
