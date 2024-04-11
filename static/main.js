@@ -1,12 +1,11 @@
 console.log("Sanity check!");
 
-fetch("http://127.0.0.1:5000/config")
+fetch("https://raspberryeclair.azurewebsites.net/config")
 .then((result) => { return result.json(); })
 .then((data) => {
   const stripe = Stripe(data.publicKey);
   document.querySelector("#bookingForm").addEventListener("submit", () => {
-    console.log("Sanity check!");
-    fetch("http://127.0.0.1:5000/create-checkout-session")
+    fetch("https://raspberryeclair.azurewebsites.net/create-checkout-session")
     .then((result) => { return result.json(); })
     .then((data) => {
       console.log(data);
