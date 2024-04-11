@@ -15,6 +15,7 @@ COPY requirements.txt .
 # Install any dependencies
 RUN pip install -r requirements.txt
 
+RUN pip install stripe
 # Copy the content of the local src directory to the working directory
 COPY app.py .
 
