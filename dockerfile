@@ -12,10 +12,12 @@ WORKDIR /app
 # Copy the dependencies file to the working directory
 COPY requirements.txt .
 
+RUN python -m pip install stripe
+
 # Install any dependencies
 RUN pip install -r requirements.txt
 
-RUN pip install stripe
+
 # Copy the content of the local src directory to the working directory
 COPY app.py .
 
