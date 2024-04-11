@@ -33,7 +33,7 @@ stripeKeys = {
 client = MongoClient(os.environ.get('MONGODB_URI'))
 # client = MongoClient("mongodb+srv://public:public@tmu.vgmkgse.mongodb.net/?retryWrites=true&w=majority&appName=TMU")
 # baseURL = "http://127.0.0.1:8000/"
-baseURl = "https://raspberryeclair.azurewebsites.net/"
+baseURL = "https://raspberryeclair.azurewebsites.net/"
 try:
     client.admin.command('ping')
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -306,7 +306,7 @@ def historyPage():
     sesh = readSlots(request.cookies.get('personalID'))
     return render_template('historyPage.html', title = title, content = cont, session = sesh)
 
-@app.route('/config')
+@app.route('/config', methods=['GET', 'POST'])
 def get_publishable_key():
     stripe_config = {"publicKey": stripeKeys["publishable_key"]}
     return jsonify(stripe_config)
