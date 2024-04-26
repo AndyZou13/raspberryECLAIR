@@ -132,7 +132,6 @@ def graphData(id):
     p3.add_tools(hover)
 
     plots = {'pricePKW': p1, 'recentCharges': p2, 'currentCharging': p3}
-
     script, div = components(plots)
     return script, div
     
