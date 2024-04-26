@@ -47,6 +47,7 @@ colUsers = db["users"]
 colData = db["data"]
 colCal = db["calendar"]
 colDataModel = db['dataModels']
+colChargeValues = db['charge-values']
 
 def graphData(id):
     docMaster = colData.find_one({"_id": ObjectId(id)})
@@ -85,8 +86,8 @@ def graphData(id):
         months=["%d %B %Y"],
         years=["%d %B %Y"],
     )
-    p1.xaxis.axis_label = "Date"
     p1.yaxis.axis_label = "price per kWh (cents)"
+    p1.xaxis.major_label_orientation = math.pi/4
     p1.toolbar.logo = None
     p1.toolbar_location = None
     hover = HoverTool(tooltips=[('Label', '@labels')]) 
@@ -101,13 +102,36 @@ def graphData(id):
         months=["%d %B %Y"],
         years=["%d %B %Y"],
     )
-    p2.xaxis.axis_label = "Date"
     p2.yaxis.axis_label = "Kilowatt per hour"
+    p2.xaxis.major_label_orientation = math.pi/4
     p2.toolbar.logo = None
     p2.toolbar_location = None
     hover = HoverTool(tooltips=[('Label', '@labels')]) 
     p2.add_tools(hover)
-    plots = {'pricePKW': p1, 'recentCharges': p2}
+
+    y3 = []
+    for x in colChargeValues.find():
+        y3.append(int(x['data']))
+    y3.reverse()
+    x = []
+    xLabels3 = []
+    for i in range(1, len(y3) + 1):
+        x.append(i)
+        xLabels3.append(f'{i} minutes ago, {y3[i-1]}kWh')
+    df3 = pd.DataFrame({'x': x, 
+                     'y': y3,
+                     'labels': xLabels3})
+    p3 = figure(sizing_mode='stretch_both', x_axis_type="datetime", title='Current Charging in Kilowatts')
+    p3.line(x = 'x', y = 'y', source = df3)
+    p3.scatter(x = 'x', y = 'y', source = df3)
+    p3.yaxis.axis_label = "Kilowatt per hour"
+    p3.xaxis.major_label_orientation = math.pi/4
+    p3.toolbar.logo = None
+    p3.toolbar_location = None
+    hover = HoverTool(tooltips=[('Label', '@labels')]) 
+    p3.add_tools(hover)
+
+    plots = {'pricePKW': p1, 'recentCharges': p2, 'currentCharging': p3}
 
     script, div = components(plots)
     return script, div
